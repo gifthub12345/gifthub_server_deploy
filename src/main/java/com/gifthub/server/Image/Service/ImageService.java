@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -161,7 +162,10 @@ public class ImageService {
     public List<ImageS3GetDTO> getImagesFromS3(Long room_id, Long category_id) {
         List<ImageEntity> byRoomIdAndCategoryId = imageRepository.findByRoomIdAndCategoryId(room_id, category_id);
         if(byRoomIdAndCategoryId != null ){
-            List<ImageS3GetDTO> allImagesFromS3 = getAllImagesFromS3(byRoomIdAndCategoryId);
+            List<ImageEntity> sortedImage = byRoomIdAndCategoryId.stream()
+                    .sorted(Comparator.comparing(ImageEntity::getExpire))
+                    .collect(Collectors.toList());
+            List<ImageS3GetDTO> allImagesFromS3 = getAllImagesFromS3(sortedImage);
             return allImagesFromS3;
 
         }

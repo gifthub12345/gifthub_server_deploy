@@ -27,7 +27,7 @@ public class RoomService {
     private final ImageRepository imageRepository;
 
     //이미 있는 코드일 때 에러 띄우기
-    public Long createRoom(Long userId) {
+    public Long createRoom(Long userId, RoomJoinDTO roomJoinDTO) {
 //        byte[] array = new byte[10];
 //        new Random().nextBytes(array);
 //        String generatedCode = new String(array, Charset.forName("UTF-8"));
@@ -38,10 +38,12 @@ public class RoomService {
             sb.append(characters.charAt(random.nextInt(characters.length())));
         }
         String generatedCode = sb.toString();
+        String title = roomJoinDTO.getTitle();
 
         if (roomRepository.findByCode(generatedCode) == null) {
             RoomEntity newRoom = RoomEntity.builder()
                     .code(generatedCode)
+                    .title(title)
                     .build();
             roomRepository.save(newRoom);
 

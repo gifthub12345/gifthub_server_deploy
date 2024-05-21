@@ -21,12 +21,14 @@ public class RoomEntity {
     private Long id;
 
     private String code;
+    private String title;
 
     @OneToMany(mappedBy = "room", fetch = FetchType.LAZY)
     private List<UserEntity> users = new ArrayList<>();
 
     @Builder
-    public RoomEntity(String code) {
+    public RoomEntity(String code, String title) {
         this.code = code;
+        this.title = title;
     }
 }

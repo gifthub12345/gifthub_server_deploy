@@ -42,10 +42,10 @@ public class RoomController {
     }
 
     @PostMapping("/room/create")
-    public ResponseEntity<?> createRoom(HttpServletRequest request) {
+    public ResponseEntity<?> createRoom(HttpServletRequest request, @RequestBody RoomJoinDTO roomJoinDTO) {
         String token = request.getHeader("Authorization");
         Long userId = userService.getUserId(token);
-        Long roomId = roomService.createRoom(userId);
+        Long roomId = roomService.createRoom(userId, roomJoinDTO);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(URI.create("/room/main/" + roomId));

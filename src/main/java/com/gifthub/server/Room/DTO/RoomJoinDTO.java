@@ -10,9 +10,11 @@ import lombok.NoArgsConstructor;
 public class RoomJoinDTO {
 
     String code;
+    String title;
 
     @Builder
-    public RoomJoinDTO(String code) {
+    public RoomJoinDTO(String code, String title) {
         this.code = code;
+        this.title = title;
     }
 }

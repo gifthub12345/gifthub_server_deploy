@@ -2,6 +2,7 @@ package com.gifthub.server.Room.Service;
 
 import com.gifthub.server.Image.Repository.ImageRepository;
 import com.gifthub.server.Room.DTO.RoomJoinDTO;
+import com.gifthub.server.Room.DTO.RoomResponseDTO;
 import com.gifthub.server.Room.Entity.RoomEntity;
 import com.gifthub.server.Room.Repository.RoomRepository;
 import com.gifthub.server.User.Entity.UserEntity;
@@ -27,7 +28,7 @@ public class RoomService {
     private final ImageRepository imageRepository;
 
     //이미 있는 코드일 때 에러 띄우기
-    public Long createRoom(Long userId, RoomJoinDTO roomJoinDTO) {
+    public RoomResponseDTO createRoom(Long userId, RoomJoinDTO roomJoinDTO) {
 //        byte[] array = new byte[10];
 //        new Random().nextBytes(array);
 //        String generatedCode = new String(array, Charset.forName("UTF-8"));
@@ -52,7 +53,10 @@ public class RoomService {
                 userRepository.save(user);
             });
 
-            return newRoom.getId();
+            return RoomResponseDTO.builder()
+                    .room_id(newRoom.getId())
+                    .code(generatedCode)
+                    .build();
         }
         else {
             return null;

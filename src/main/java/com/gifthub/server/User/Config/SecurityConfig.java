@@ -34,7 +34,7 @@ public class SecurityConfig{
     public WebSecurityCustomizer webSecurityCustomizer() {
         return web -> web
                 .ignoring()
-                .requestMatchers("/error", "/favicon.ico");
+                .requestMatchers("/error", "/favicon.ico", "/resources/**");
     }
 
     @Bean
@@ -53,18 +53,17 @@ public class SecurityConfig{
                         head.frameOptions(
                                 HeadersConfigurer.FrameOptionsConfig::disable
                         ).disable())
-                .oauth2Login(oauth ->
-                        oauth
-                                .userInfoEndpoint(userInfoEndpointConfig ->
-                                        userInfoEndpointConfig.userService(oAuth2Service))
-                                .tokenEndpoint(token ->
-                                        token.accessTokenResponseClient(this.accessTokenResponseClient()))
-                                .successHandler(successHandler)
-                )
+//                .oauth2Login(oauth ->
+//                        oauth
+//                                .userInfoEndpoint(userInfoEndpointConfig ->
+//                                        userInfoEndpointConfig.userService(oAuth2Service))
+//                                .tokenEndpoint(token ->
+//                                        token.accessTokenResponseClient(this.accessTokenResponseClient()))
+//                                .successHandler(successHandler)
+//                )
                 .authorizeHttpRequests(auth ->
                         auth
                                 .requestMatchers("/**").permitAll()
-                                .anyRequest().authenticated()
                 )
                 .sessionManagement(session ->
                         session
@@ -74,13 +73,13 @@ public class SecurityConfig{
         return http.build();
     }
 
-    @Bean
-    public OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> accessTokenResponseClient() {
-        DefaultAuthorizationCodeTokenResponseClient accessTokenResponseClient = new DefaultAuthorizationCodeTokenResponseClient();
-        accessTokenResponseClient.setRequestEntityConverter(converter);
-
-        return accessTokenResponseClient;
-    }
+//    @Bean
+//    public OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> accessTokenResponseClient() {
+//        DefaultAuthorizationCodeTokenResponseClient accessTokenResponseClient = new DefaultAuthorizationCodeTokenResponseClient();
+//        accessTokenResponseClient.setRequestEntityConverter(converter);
+//
+//        return accessTokenResponseClient;
+//    }
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {

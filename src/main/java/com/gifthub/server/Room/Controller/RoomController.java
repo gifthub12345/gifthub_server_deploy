@@ -4,6 +4,7 @@ import com.gifthub.server.Category.DTO.CategoryDTO;
 import com.gifthub.server.Category.Service.CategoryService;
 import com.gifthub.server.Image.Service.ImageService;
 import com.gifthub.server.Room.DTO.RoomJoinDTO;
+import com.gifthub.server.Room.DTO.RoomResponseDTO;
 import com.gifthub.server.Room.Service.RoomService;
 import com.gifthub.server.User.DTO.UserInfoDTO;
 import com.gifthub.server.User.Entity.UserEntity;
@@ -35,9 +36,7 @@ public class RoomController {
         Long userId = userService.getUserId(token);
         Long roomId = roomService.enterRoom(userId, roomJoinDTO);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(URI.create("/room/main/" + roomId));
-        return new ResponseEntity<>(headers, HttpStatus.MOVED_PERMANENTLY);
+        return new ResponseEntity<>(roomId, HttpStatus.OK);
 
     }
 
@@ -45,11 +44,9 @@ public class RoomController {
     public ResponseEntity<?> createRoom(HttpServletRequest request, @RequestBody RoomJoinDTO roomJoinDTO) {
         String token = request.getHeader("Authorization");
         Long userId = userService.getUserId(token);
-        Long roomId = roomService.createRoom(userId, roomJoinDTO);
+        RoomResponseDTO responseDTO = roomService.createRoom(userId, roomJoinDTO);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(URI.create("/room/main/" + roomId));
-        return new ResponseEntity<>(headers, HttpStatus.MOVED_PERMANENTLY);
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
     @GetMapping("/room/main/{room_id}")

@@ -6,10 +6,9 @@ import org.springframework.context.annotation.Configuration;
 
 @Data
 @Configuration
-@ConfigurationProperties(prefix = "apple")
-public class AppleDTO {
-    private String keyId;
+@ConfigurationProperties(prefix = "google")
+public class GoogleDTO {
     private String clientId;
-    private String teamId;
+    private String clientSecret;
     private String redirectUri;
 }

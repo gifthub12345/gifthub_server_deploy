@@ -1,37 +1,49 @@
 package com.gifthub.server.User.Controller;
 
-import com.gifthub.server.User.DTO.AccessTokenDTO;
+import com.gifthub.server.User.DTO.*;
+import com.gifthub.server.User.Service.OAuth2Service;
 import com.gifthub.server.User.Service.UserService;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
 
 @RequiredArgsConstructor
 @RestController
 public class LoginController {
 
     private final UserService userService;
+    private final OAuth2Service oAuth2Service;
 
-    @GetMapping("/login/google")
-    public ResponseEntity<?> GoogleLogin() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(URI.create("/oauth2/authorization/google"));
-        return new ResponseEntity<>(headers, HttpStatus.MOVED_PERMANENTLY);
+    @PostMapping("/login/google")
+    public ResponseEntity<?> GoogleLogin(HttpServletResponse response, @RequestBody AuthorizationCodeDTO codeDTO) throws IOException, ServletException {
+        String accessToken = userService.GoogleGetAccessToken(codeDTO).getAccess_token();
+        SuccessHandlerDTO result = userService.getGoogleUserInfo(accessToken);
+
+        response.setHeader("Authorization", result.getAccessToken());
+        response.setHeader("RefreshToken", result.getRefreshToken());
+
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @GetMapping("/login/apple")
-    public ResponseEntity<?> AppleLogin() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(URI.create("/oauth2/authorization/apple"));
-        return new ResponseEntity<>(headers, HttpStatus.MOVED_PERMANENTLY);
+    @PostMapping("/login/apple")
+    public ResponseEntity<?> AppleLogin(HttpServletResponse response, @RequestBody AuthorizationCodeDTO codeDTO) throws IOException, ServletException {
+        String accessToken = userService.AppleGetAccessToken(codeDTO).getAccess_token();
+        String idToken = userService.AppleGetAccessToken(codeDTO).getId_token();
+        SuccessHandlerDTO result = userService.getAppleUserInfo(accessToken, idToken);
+
+        response.setHeader("Authorization", result.getAccessToken());
+        response.setHeader("RefreshToken", result.getRefreshToken());
+
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @DeleteMapping("/revoke")

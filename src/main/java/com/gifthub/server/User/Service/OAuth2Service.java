@@ -7,19 +7,31 @@ import com.gifthub.server.User.Entity.UserEntity;
 import com.gifthub.server.User.Jwt.JwtTokenProvider;
 import com.gifthub.server.User.Jwt.Token;
 import com.gifthub.server.User.Repository.UserRepository;
+import com.gifthub.server.User.Util.CustomRequestEntityConverter;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.*;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
+import java.io.IOException;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collections;
@@ -32,6 +44,8 @@ import java.util.Map;
 public class OAuth2Service extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
+    private final JwtTokenProvider jwtTokenProvider;
+
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -83,12 +97,10 @@ public class OAuth2Service extends DefaultOAuth2UserService {
 
         return new CustomOAuth2User(userOAuthDTO);
 
-//        return new DefaultOAuth2User(
-//                Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")),
-//                authAttributes.getAttributes(),
-//                authAttributes.getNameAttributeKey());
-
     }
+
+
+
 
     public Map<String, Object> decodeJwtTokenPayload(String jwtToken) {
         Map<String, Object> jwtClaims = new HashMap<>();
@@ -108,6 +120,9 @@ public class OAuth2Service extends DefaultOAuth2UserService {
         }
         return jwtClaims;
     }
+
+
+
 
 
 }

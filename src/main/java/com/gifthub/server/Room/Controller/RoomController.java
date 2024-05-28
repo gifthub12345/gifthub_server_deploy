@@ -65,8 +65,8 @@ public class RoomController {
 
     @GetMapping("/room/{room_id}/users")
     public ResponseEntity<?> getUsers(@PathVariable("room_id") Long room_id) throws IOException {
-        List<UserInfoDTO> userinfoList = userService.getUserList(room_id);
-        return new ResponseEntity<>(userinfoList, HttpStatus.OK);
+        List<String> userEmailList = userService.getUserList(room_id);
+        return new ResponseEntity<>(userEmailList, HttpStatus.OK);
     }
 
     @GetMapping("/room/{room_id}/share")

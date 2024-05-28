@@ -35,9 +35,10 @@ public class LoginController {
     }
 
     @PostMapping("/login/apple")
-    public ResponseEntity<?> AppleLogin(HttpServletResponse response, @RequestBody AuthorizationCodeDTO codeDTO) throws IOException, ServletException {
-        String accessToken = userService.AppleGetAccessToken(codeDTO).getAccess_token();
-        String idToken = userService.AppleGetAccessToken(codeDTO).getId_token();
+    public ResponseEntity<?> AppleLogin(HttpServletResponse response, @RequestBody AuthorizationCodeDTO codeDTO) throws Exception {
+        AccessTokenDTO accessTokenDTO = userService.AppleGetAccessToken(codeDTO);
+        String accessToken = accessTokenDTO.getAccess_token();
+        String idToken = accessTokenDTO.getId_token();
         SuccessHandlerDTO result = userService.getAppleUserInfo(accessToken, idToken);
 
         response.setHeader("Authorization", result.getAccessToken());
@@ -47,7 +48,7 @@ public class LoginController {
     }
 
     @DeleteMapping("/revoke")
-    public ResponseEntity<?> RevokeUser(HttpServletRequest request, @RequestBody AccessTokenDTO accessToken) {
+    public ResponseEntity<?> RevokeUser(HttpServletRequest request, @RequestBody String accessToken) {
         String token = request.getHeader("Authorization");
         userService.revoke(token, accessToken);
         return new ResponseEntity<>(HttpStatus.OK);

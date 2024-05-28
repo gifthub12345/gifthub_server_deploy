@@ -58,28 +58,24 @@ public class UserService {
         }
     }
 
-    public List<UserInfoDTO> getUserList(Long roomId) {
+    public List<String> getUserList(Long roomId) {
         Optional<RoomEntity> room = roomRepository.findById(roomId);
         if (room.isPresent()) {
-            List<UserInfoDTO> userInfoDTO = new ArrayList<>();
+            List<String> userEmail = new ArrayList<>();
             RoomEntity roomEntity = room.get();
 
             for(UserEntity userEntity : roomEntity.getUsers()) {
-                UserInfoDTO users = UserInfoDTO.builder()
-                        .email(userEntity.getEmail())
-                        .build();
-                userInfoDTO.add(users);
+                userEmail.add(userEntity.getEmail());
             }
 
-            return userInfoDTO;
+            return userEmail;
         }
         else {
             throw new RoomNotFoundException();
         }
     }
 
-    public void revoke(String jwtToken, AccessTokenDTO accessTokenDTO) {
-        String accessToken = accessTokenDTO.getAccess_token();
+    public void revoke(String jwtToken, String accessToken) {
         RestTemplate restTemplate = new RestTemplate();
         String identifier = jwtTokenProvider.getIdentifierFromToken(jwtToken);
         UserEntity userEntity = userRepository.findByIdentifier(identifier);
@@ -182,7 +178,7 @@ public class UserService {
 
     }
 
-    public AccessTokenDTO AppleGetAccessToken(AuthorizationCodeDTO codeDTO) throws IOException{
+    public AccessTokenDTO AppleGetAccessToken(AuthorizationCodeDTO codeDTO) throws IOException {
         String decodedCode = URLDecoder.decode(codeDTO.getAuthCode(), StandardCharsets.UTF_8);
         RestTemplate restTemplate = new RestTemplateBuilder().build();
         String authUrl = "https://appleid.apple.com/auth/token";

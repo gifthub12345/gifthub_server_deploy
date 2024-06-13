@@ -142,7 +142,7 @@ public class UserService {
             return response.getBody();
 //            return new OAuth2AccessToken(OAuth2AccessToken.TokenType.BEARER, accessToken, null, null);
         } catch (HttpClientErrorException e) {
-            throw new IllegalArgumentException("Google Auth Token Error");
+            throw new IllegalArgumentException(e);
         }
 
     }

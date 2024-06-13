@@ -1,7 +1,7 @@
 package com.gifthub.server.Image.Entity;
 
 import com.gifthub.server.Category.Entity.CategoryEntity;
-import com.gifthub.server.Room.Entity.RoomEntity;
+import com.gifthub.server.Image.Room.Entity.RoomEntity;
 import com.gifthub.server.User.Entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -10,8 +10,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
 @Getter

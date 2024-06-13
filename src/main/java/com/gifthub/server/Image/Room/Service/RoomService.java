@@ -1,10 +1,10 @@
-package com.gifthub.server.Room.Service;
+package com.gifthub.server.Image.Room.Service;
 
 import com.gifthub.server.Image.Repository.ImageRepository;
-import com.gifthub.server.Room.DTO.RoomJoinDTO;
-import com.gifthub.server.Room.DTO.RoomResponseDTO;
-import com.gifthub.server.Room.Entity.RoomEntity;
-import com.gifthub.server.Room.Repository.RoomRepository;
+import com.gifthub.server.Image.Room.DTO.RoomJoinDTO;
+import com.gifthub.server.Image.Room.DTO.RoomResponseDTO;
+import com.gifthub.server.Image.Room.Entity.RoomEntity;
+import com.gifthub.server.Image.Room.Repository.RoomRepository;
 import com.gifthub.server.User.Entity.UserEntity;
 import com.gifthub.server.User.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,10 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.charset.Charset;
 import java.security.SecureRandom;
 import java.util.Optional;
-import java.util.Random;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -103,5 +101,11 @@ public class RoomService {
     public String shareRoomCode(Long roomId) {
         RoomEntity roomEntity = roomRepository.findById(roomId).orElseThrow();
         return roomEntity.getCode();
+    }
+
+    public String getRoomTitle(Long room_id){
+        RoomEntity roomEntity = roomRepository.findById(room_id).orElseThrow();
+        return roomEntity.getTitle();
+
     }
 }

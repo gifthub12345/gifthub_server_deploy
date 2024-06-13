@@ -1,4 +1,4 @@
-package com.gifthub.server.Room.Exception;
+package com.gifthub.server.Image.Room.Exception;
 
 import com.gifthub.server.Exception.GifthubException;
 

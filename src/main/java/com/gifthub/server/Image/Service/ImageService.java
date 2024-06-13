@@ -12,8 +12,8 @@ import com.gifthub.server.Image.DTO.ImageUploadDTO;
 import com.gifthub.server.Image.Entity.ImageEntity;
 import com.gifthub.server.Image.Exception.*;
 import com.gifthub.server.Image.Repository.ImageRepository;
-import com.gifthub.server.Room.Entity.RoomEntity;
-import com.gifthub.server.Room.Repository.RoomRepository;
+import com.gifthub.server.Image.Room.Entity.RoomEntity;
+import com.gifthub.server.Image.Room.Repository.RoomRepository;
 import com.gifthub.server.User.Entity.UserEntity;
 import com.gifthub.server.User.Repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -176,7 +176,9 @@ public class ImageService {
     public List<ImageS3GetDTO> getAllImagesFromS3(List<ImageEntity> s3List) {
         List<ImageS3GetDTO> imageS3GetDTOList = new ArrayList<>();
         for(ImageEntity imageEntity: s3List){
-            ImageS3GetDTO imageS3GetDTO = ImageS3GetDTO.builder().url(imageEntity.getUrl()).build();
+            ImageS3GetDTO imageS3GetDTO = ImageS3GetDTO.builder()
+                    .id(imageEntity.getId())
+                    .url(imageEntity.getUrl()).build();
             imageS3GetDTOList.add(imageS3GetDTO);
         }
         return imageS3GetDTOList;

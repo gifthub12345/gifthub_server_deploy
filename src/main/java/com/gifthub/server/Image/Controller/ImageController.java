@@ -4,14 +4,12 @@ import com.gifthub.server.Image.DTO.ImageOcrDTO;
 import com.gifthub.server.Image.DTO.ImageS3GetDTO;
 import com.gifthub.server.Image.DTO.ImageUploadDTO;
 import com.gifthub.server.Image.Service.ImageService;
-import com.gifthub.server.Room.Repository.RoomRepository;
+import com.gifthub.server.Image.Room.Repository.RoomRepository;
 import com.gifthub.server.User.Service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 

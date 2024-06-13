@@ -1,4 +1,4 @@
-package com.gifthub.server.Room.DTO;
+package com.gifthub.server.Image.Room.DTO;
 
 import lombok.AccessLevel;
 import lombok.Builder;

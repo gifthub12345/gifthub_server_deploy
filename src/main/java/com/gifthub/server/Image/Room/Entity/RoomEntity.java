@@ -1,4 +1,4 @@
-package com.gifthub.server.Room.Entity;
+package com.gifthub.server.Image.Room.Entity;
 
 import com.gifthub.server.User.Entity.UserEntity;
 import jakarta.persistence.*;

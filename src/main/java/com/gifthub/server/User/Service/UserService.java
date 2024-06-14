@@ -2,9 +2,9 @@ package com.gifthub.server.User.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gifthub.server.Image.Room.Entity.RoomEntity;
-import com.gifthub.server.Image.Room.Exception.RoomNotFoundException;
-import com.gifthub.server.Image.Room.Repository.RoomRepository;
+import com.gifthub.server.Room.Entity.RoomEntity;
+import com.gifthub.server.Room.Exception.RoomNotFoundException;
+import com.gifthub.server.Room.Repository.RoomRepository;
 import com.gifthub.server.User.DTO.*;
 import com.gifthub.server.User.Entity.UserEntity;
 import com.gifthub.server.User.Jwt.JwtTokenProvider;
@@ -140,7 +140,7 @@ public class UserService {
             return response.getBody();
 //            return new OAuth2AccessToken(OAuth2AccessToken.TokenType.BEARER, accessToken, null, null);
         } catch (HttpClientErrorException e) {
-            throw new IllegalArgumentException("Google Auth Token Error");
+            throw new IllegalArgumentException(e);
         }
 
     }

@@ -4,7 +4,7 @@ import com.gifthub.server.Image.DTO.ImageOcrDTO;
 import com.gifthub.server.Image.DTO.ImageS3GetDTO;
 import com.gifthub.server.Image.DTO.ImageUploadDTO;
 import com.gifthub.server.Image.Service.ImageService;
-import com.gifthub.server.Image.Room.Repository.RoomRepository;
+import com.gifthub.server.Room.Repository.RoomRepository;
 import com.gifthub.server.User.Service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;

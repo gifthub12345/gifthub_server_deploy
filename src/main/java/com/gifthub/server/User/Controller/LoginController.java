@@ -24,8 +24,9 @@ public class LoginController {
     private final OAuth2Service oAuth2Service;
 
     @PostMapping("/login/google")
-    public ResponseEntity<?> GoogleLogin(HttpServletResponse response, @RequestBody AuthorizationCodeDTO codeDTO) throws IOException, ServletException {
-        String accessToken = userService.GoogleGetAccessToken(codeDTO).getAccess_token();
+    public ResponseEntity<?> GoogleLogin(HttpServletResponse response, @RequestBody AccessTokenOnlyDTO token) throws IOException, ServletException {
+//        String accessToken = userService.GoogleGetAccessToken(codeDTO).getAccess_token();
+        String accessToken = token.getToken();
         SuccessHandlerDTO result = userService.getGoogleUserInfo(accessToken);
 
         response.setHeader("Authorization", result.getAccessToken());
@@ -48,10 +49,11 @@ public class LoginController {
     }
 
     @DeleteMapping("/revoke")
-    public ResponseEntity<?> RevokeUser(HttpServletRequest request, @RequestBody String accessToken) {
+    public ResponseEntity<?> RevokeUser(HttpServletRequest request, @RequestBody AccessTokenOnlyDTO accessTokenOnlyDTO) {
+
         String token = request.getHeader("Authorization");
+        String accessToken = accessTokenOnlyDTO.getToken();
         userService.revoke(token, accessToken);
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
 }

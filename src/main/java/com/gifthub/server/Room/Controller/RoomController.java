@@ -1,9 +1,10 @@
-package com.gifthub.server.Image.Room.Controller;
+package com.gifthub.server.Room.Controller;
 
 import com.gifthub.server.Category.Service.CategoryService;
-import com.gifthub.server.Image.Room.DTO.RoomJoinDTO;
-import com.gifthub.server.Image.Room.DTO.RoomResponseDTO;
-import com.gifthub.server.Image.Room.Service.RoomService;
+import com.gifthub.server.Room.DTO.RoomJoinDTO;
+import com.gifthub.server.Room.DTO.RoomMainDTO;
+import com.gifthub.server.Room.DTO.RoomResponseDTO;
+import com.gifthub.server.Room.Service.RoomService;
 import com.gifthub.server.User.Service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -46,7 +47,8 @@ public class RoomController {
     public ResponseEntity<?> mainRoom(@PathVariable("room_id") Long room_id) {
         // List<CategoryDTO> categoryDTOList = categoryService.CategoryDTOList(categoryService.getAllCategories());
         String roomTitle = roomService.getRoomTitle(room_id);
-        return new ResponseEntity<>(roomTitle, HttpStatus.OK);
+        RoomMainDTO roomMainDTO = RoomMainDTO.builder().title(roomTitle).build();
+        return new ResponseEntity<>(roomMainDTO, HttpStatus.OK);
     }
 
     @PostMapping("/room/exit/{room_id}")

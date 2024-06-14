@@ -1,4 +1,4 @@
-package com.gifthub.server.Image.Room.DTO;
+package com.gifthub.server.Room.DTO;
 
 import lombok.Builder;
 import lombok.Data;

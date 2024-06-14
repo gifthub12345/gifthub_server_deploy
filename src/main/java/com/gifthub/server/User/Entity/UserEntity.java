@@ -1,6 +1,6 @@
 package com.gifthub.server.User.Entity;
 
-import com.gifthub.server.Image.Room.Entity.RoomEntity;
+import com.gifthub.server.Room.Entity.RoomEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;

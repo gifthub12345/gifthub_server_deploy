@@ -1,5 +1,4 @@
-package com.gifthub.server.Image.Room.DTO;
-
+package com.gifthub.server.Room.DTO;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
@@ -7,14 +6,11 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class RoomJoinDTO {
-
-    String code;
+public class RoomMainDTO {
     String title;
 
     @Builder
-    public RoomJoinDTO(String code, String title) {
-        this.code = code;
+    public RoomMainDTO(String title) {
         this.title = title;
     }
 }

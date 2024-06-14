@@ -1,10 +1,10 @@
-package com.gifthub.server.Image.Room.Service;
+package com.gifthub.server.Room.Service;
 
 import com.gifthub.server.Image.Repository.ImageRepository;
-import com.gifthub.server.Image.Room.DTO.RoomJoinDTO;
-import com.gifthub.server.Image.Room.DTO.RoomResponseDTO;
-import com.gifthub.server.Image.Room.Entity.RoomEntity;
-import com.gifthub.server.Image.Room.Repository.RoomRepository;
+import com.gifthub.server.Room.DTO.RoomJoinDTO;
+import com.gifthub.server.Room.DTO.RoomResponseDTO;
+import com.gifthub.server.Room.Entity.RoomEntity;
+import com.gifthub.server.Room.Repository.RoomRepository;
 import com.gifthub.server.User.Entity.UserEntity;
 import com.gifthub.server.User.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;

@@ -12,10 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.charset.Charset;
 import java.security.SecureRandom;
 import java.util.Optional;
-import java.util.Random;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -103,5 +101,11 @@ public class RoomService {
     public String shareRoomCode(Long roomId) {
         RoomEntity roomEntity = roomRepository.findById(roomId).orElseThrow();
         return roomEntity.getCode();
+    }
+
+    public String getRoomTitle(Long room_id){
+        RoomEntity roomEntity = roomRepository.findById(room_id).orElseThrow();
+        return roomEntity.getTitle();
+
     }
 }

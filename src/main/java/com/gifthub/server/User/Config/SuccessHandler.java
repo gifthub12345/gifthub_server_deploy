@@ -1,7 +1,6 @@
 package com.gifthub.server.User.Config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gifthub.server.Room.Entity.RoomEntity;
 import com.gifthub.server.User.DTO.CustomOAuth2User;
 import com.gifthub.server.User.Entity.UserEntity;
 import com.gifthub.server.User.Jwt.JwtTokenProvider;
@@ -10,11 +9,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.util.HashMap;

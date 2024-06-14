@@ -176,7 +176,9 @@ public class ImageService {
     public List<ImageS3GetDTO> getAllImagesFromS3(List<ImageEntity> s3List) {
         List<ImageS3GetDTO> imageS3GetDTOList = new ArrayList<>();
         for(ImageEntity imageEntity: s3List){
-            ImageS3GetDTO imageS3GetDTO = ImageS3GetDTO.builder().url(imageEntity.getUrl()).build();
+            ImageS3GetDTO imageS3GetDTO = ImageS3GetDTO.builder()
+                    .id(imageEntity.getId())
+                    .url(imageEntity.getUrl()).build();
             imageS3GetDTOList.add(imageS3GetDTO);
         }
         return imageS3GetDTOList;

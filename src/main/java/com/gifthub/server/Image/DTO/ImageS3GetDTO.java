@@ -9,9 +9,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ImageS3GetDTO {
     private String url;
+    private Long id;
+
 
     @Builder
-    public ImageS3GetDTO(String url) {
+    public ImageS3GetDTO(String url, Long id) {
+        this.id = id;
         this.url = url;
     }
 

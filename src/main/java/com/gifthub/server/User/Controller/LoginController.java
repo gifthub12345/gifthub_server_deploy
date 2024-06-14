@@ -49,10 +49,11 @@ public class LoginController {
     }
 
     @DeleteMapping("/revoke")
-    public ResponseEntity<?> RevokeUser(HttpServletRequest request, @RequestBody String accessToken) {
+    public ResponseEntity<?> RevokeUser(HttpServletRequest request, @RequestBody AccessTokenOnlyDTO accessTokenOnlyDTO) {
+
         String token = request.getHeader("Authorization");
+        String accessToken = accessTokenOnlyDTO.getToken();
         userService.revoke(token, accessToken);
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
 }

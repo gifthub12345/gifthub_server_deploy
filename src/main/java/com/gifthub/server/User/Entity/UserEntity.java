@@ -43,6 +43,11 @@ public class UserEntity {
         this.refresh_token = refresh_token;
     }
 
+    public void updateGoogle(String newName, String newEmail) {
+        this.name = newName;
+        this.email = newEmail;
+    }
+
     public void updateRoom(RoomEntity newRoom) {
         this.room = newRoom;
     }

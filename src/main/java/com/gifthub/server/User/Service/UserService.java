@@ -102,7 +102,7 @@ public class UserService {
 
     }
 
-    public SuccessHandlerDTO getGoogleUserInfo(String accessToken, String idToken) {
+    public SuccessHandlerDTO getGoogleUserInfo(String accessToken) {
         RestTemplate restTemplate = new RestTemplateBuilder().build();
         String infoUrl = "https://www.googleapis.com/oauth2/v3/userinfo";
 
@@ -120,12 +120,11 @@ public class UserService {
                     .identifier(identifier)
                     .name(info.getName())
                     .email(info.getEmail())
-                    .refresh_token(idToken)
                     .build();
             userRepository.save(newUser);
         }
         else {
-            existUser.update(info.getName(), info.getEmail(), idToken);
+            existUser.updateGoogle(info.getName(), info.getEmail());
             userRepository.save(existUser);
         }
 

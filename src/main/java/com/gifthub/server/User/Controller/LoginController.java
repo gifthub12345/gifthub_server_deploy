@@ -23,9 +23,8 @@ public class LoginController {
     @PostMapping("/login/google")
     public ResponseEntity<?> GoogleLogin(HttpServletResponse response, @RequestBody AccessTokenOnlyDTO token) throws IOException, ServletException {
 //        String accessToken = userService.GoogleGetAccessToken(codeDTO).getAccess_token();
-        String accessToken = token.getAccessToken();
-        String idToken = token.getIdToken();
-        SuccessHandlerDTO result = userService.getGoogleUserInfo(accessToken, idToken);
+        String accessToken = token.getToken();
+        SuccessHandlerDTO result = userService.getGoogleUserInfo(accessToken);
 
         response.setHeader("Authorization", result.getAccessToken());
         response.setHeader("RefreshToken", result.getRefreshToken());

@@ -11,12 +11,10 @@ import com.gifthub.server.User.Jwt.JwtTokenProvider;
 import com.gifthub.server.User.Repository.UserRepository;
 import com.gifthub.server.User.Util.CustomRequestEntityConverter;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -75,52 +73,8 @@ public class UserService {
         }
     }
 
-    public void revoke(String jwtToken, String accessToken) {
-        RestTemplate restTemplate = new RestTemplate();
-        String identifier = jwtTokenProvider.getIdentifierFromToken(jwtToken);
-        UserEntity userEntity = userRepository.findByIdentifier(identifier);
 
-        if (identifier.contains("google")) {
-            String revoke_url = "https://accounts.google.com/o/oauth2/revoke";
-
-            LinkedMultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-            params.add("token", accessToken);
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-            headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-            HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(params, headers);
-
-            restTemplate.postForEntity(revoke_url, httpEntity, String.class);
-
-            userRepository.delete(userEntity);
-
-        } else if (identifier.contains("apple")) {
-            String revoke_url = "https://appleid.apple.com/auth/revoke";
-
-            try {
-                LinkedMultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-                params.add("client_id", appleDTO.getClientId());
-                params.add("client_secret", converter.createClientSecret(appleDTO.getKeyId(), appleDTO.getClientId(), appleDTO.getTeamId()));
-                params.add("token", accessToken);
-
-                HttpHeaders headers = new HttpHeaders();
-                headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-                headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-                HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(params, headers);
-
-                restTemplate.postForEntity(revoke_url, httpEntity, String.class);
-
-                userRepository.delete(userEntity);
-
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-        }
-    }
-
-    public AccessTokenDTO GoogleGetAccessToken(AuthorizationCodeDTO codeDTO){
+    public GoogleTokenDTO GoogleGetAccessToken(AuthorizationCodeDTO codeDTO){
         String decodedCode = URLDecoder.decode(codeDTO.getAuthCode(), StandardCharsets.UTF_8);
         RestTemplate restTemplate = new RestTemplateBuilder().build();
         String authUrl = "https://oauth2.googleapis.com/token";
@@ -130,6 +84,7 @@ public class UserService {
         params.add("client_id", googleDTO.getClientId());
         params.add("client_secret", googleDTO.getClientSecret());
         params.add("redirect_uri", googleDTO.getRedirectUri());
+        params.add("access_type", "offline");
         params.add("grant_type", "authorization_code");
 
         HttpHeaders headers = new HttpHeaders();
@@ -138,7 +93,7 @@ public class UserService {
         HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(params, headers);
 
         try {
-            ResponseEntity<AccessTokenDTO> response = restTemplate.postForEntity(authUrl, httpEntity, AccessTokenDTO.class);
+            ResponseEntity<GoogleTokenDTO> response = restTemplate.postForEntity(authUrl, httpEntity, GoogleTokenDTO.class);
             return response.getBody();
 //            return new OAuth2AccessToken(OAuth2AccessToken.TokenType.BEARER, accessToken, null, null);
         } catch (HttpClientErrorException e) {
@@ -147,7 +102,7 @@ public class UserService {
 
     }
 
-    public SuccessHandlerDTO getGoogleUserInfo(String accessToken) {
+    public SuccessHandlerDTO getGoogleUserInfo(String accessToken, String idToken) {
         RestTemplate restTemplate = new RestTemplateBuilder().build();
         String infoUrl = "https://www.googleapis.com/oauth2/v3/userinfo";
 
@@ -165,11 +120,12 @@ public class UserService {
                     .identifier(identifier)
                     .name(info.getName())
                     .email(info.getEmail())
+                    .refresh_token(idToken)
                     .build();
             userRepository.save(newUser);
         }
         else {
-            existUser.update(info.getName(), info.getEmail());
+            existUser.update(info.getName(), info.getEmail(), idToken);
             userRepository.save(existUser);
         }
 
@@ -178,7 +134,7 @@ public class UserService {
 
     }
 
-    public AccessTokenDTO AppleGetAccessToken(AuthorizationCodeDTO codeDTO) throws IOException {
+    public AppleTokenDTO AppleGetAccessToken(AuthorizationCodeDTO codeDTO) throws IOException {
         String decodedCode = URLDecoder.decode(codeDTO.getAuthCode(), StandardCharsets.UTF_8);
         RestTemplate restTemplate = new RestTemplateBuilder().build();
         String authUrl = "https://appleid.apple.com/auth/token";
@@ -196,7 +152,7 @@ public class UserService {
         HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(params, headers);
 
         try {
-            ResponseEntity<AccessTokenDTO> response = restTemplate.postForEntity(authUrl, httpEntity, AccessTokenDTO.class);
+            ResponseEntity<AppleTokenDTO> response = restTemplate.postForEntity(authUrl, httpEntity, AppleTokenDTO.class);
             return response.getBody();
         } catch (HttpClientErrorException e) {
             throw new IllegalArgumentException(e);
@@ -205,7 +161,7 @@ public class UserService {
     }
 
 
-    public SuccessHandlerDTO getAppleUserInfo(String accessToken, String idToken) throws IOException, ServletException {
+    public SuccessHandlerDTO getAppleUserInfo(String accessToken, String idToken, String refreshToken) throws IOException, ServletException {
         Map<String, Object> userinfo = decodeJwtTokenPayload(idToken);
         UserInfoDTO info = UserInfoDTO.builder()
                 .sub("apple" + userinfo.get("sub").toString())
@@ -220,11 +176,12 @@ public class UserService {
                     .identifier(info.getSub())
                     .name(info.getName())
                     .email(info.getEmail())
+                    .refresh_token(refreshToken)
                     .build();
             userRepository.save(newUser);
         }
         else {
-            existUser.update(info.getName(), info.getEmail());
+            existUser.update(info.getName(), info.getEmail(), refreshToken);
             userRepository.save(existUser);
         }
 
@@ -274,6 +231,105 @@ public class UserService {
                 .build();
 
         return result;
+    }
+
+
+    public void revoke(String jwtToken) {
+        RestTemplate restTemplate = new RestTemplate();
+        String identifier = jwtTokenProvider.getIdentifierFromToken(jwtToken);
+        UserEntity userEntity = userRepository.findByIdentifier(identifier);
+        String refreshToken = userEntity.getRefresh_token();
+
+        if (identifier.contains("google")) {
+            String revoke_url = "https://accounts.google.com/o/oauth2/revoke";
+
+            String accessToken = GoogleGetTokenWithRefreshToken(refreshToken);
+
+            LinkedMultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+            params.add("token", accessToken);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+            headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+            HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(params, headers);
+
+            restTemplate.postForEntity(revoke_url, httpEntity, String.class);
+
+            userRepository.delete(userEntity);
+
+        } else if (identifier.contains("apple")) {
+            String revoke_url = "https://appleid.apple.com/auth/revoke";
+
+            try {
+                String accessToken = AppleGetTokenWithRefreshToken(refreshToken);
+                LinkedMultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+                params.add("client_id", appleDTO.getClientId());
+                params.add("client_secret", converter.createClientSecret(appleDTO.getKeyId(), appleDTO.getClientId(), appleDTO.getTeamId()));
+                params.add("token", accessToken);
+
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+                headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+                HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(params, headers);
+
+                restTemplate.postForEntity(revoke_url, httpEntity, String.class);
+
+                userRepository.delete(userEntity);
+
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+        }
+    }
+
+    public String AppleGetTokenWithRefreshToken(String refreshToken) throws IOException {
+        RestTemplate restTemplate = new RestTemplateBuilder().build();
+        String authUrl = "https://appleid.apple.com/auth/token";
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("client_id", appleDTO.getClientId());
+        params.add("client_secret", converter.createClientSecret(appleDTO.getKeyId(), appleDTO.getClientId(), appleDTO.getTeamId()));
+        params.add("refresh_token", refreshToken);
+        params.add("redirect_uri", appleDTO.getRedirectUri());
+        params.add("grant_type", "refresh_token");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+        HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(params, headers);
+
+        try {
+            ResponseEntity<AppleTokenDTO> response = restTemplate.postForEntity(authUrl, httpEntity, AppleTokenDTO.class);
+            return response.getBody().getAccess_token();
+        } catch (HttpClientErrorException e) {
+            throw new IllegalArgumentException(e);
+        }
+
+    }
+
+    public String GoogleGetTokenWithRefreshToken(String refreshToken){
+        RestTemplate restTemplate = new RestTemplateBuilder().build();
+        String authUrl = "https://oauth2.googleapis.com/token";
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("client_id", googleDTO.getClientId());
+        params.add("client_secret", googleDTO.getClientSecret());
+        params.add("refresh_token", refreshToken);
+        params.add("grant_type", "refresh_token");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+        HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(params, headers);
+
+        try {
+            ResponseEntity<GoogleTokenDTO> response = restTemplate.postForEntity(authUrl, httpEntity, GoogleTokenDTO.class);
+            return response.getBody().getAccess_token();
+        } catch (HttpClientErrorException e) {
+            throw new IllegalArgumentException(e);
+        }
+
     }
 
 

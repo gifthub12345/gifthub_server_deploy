@@ -7,14 +7,11 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.net.URI;
 
 @RequiredArgsConstructor
 @RestController
@@ -26,8 +23,9 @@ public class LoginController {
     @PostMapping("/login/google")
     public ResponseEntity<?> GoogleLogin(HttpServletResponse response, @RequestBody AccessTokenOnlyDTO token) throws IOException, ServletException {
 //        String accessToken = userService.GoogleGetAccessToken(codeDTO).getAccess_token();
-        String accessToken = token.getToken();
-        SuccessHandlerDTO result = userService.getGoogleUserInfo(accessToken);
+        String accessToken = token.getAccessToken();
+        String idToken = token.getIdToken();
+        SuccessHandlerDTO result = userService.getGoogleUserInfo(accessToken, idToken);
 
         response.setHeader("Authorization", result.getAccessToken());
         response.setHeader("RefreshToken", result.getRefreshToken());
@@ -37,10 +35,11 @@ public class LoginController {
 
     @PostMapping("/login/apple")
     public ResponseEntity<?> AppleLogin(HttpServletResponse response, @RequestBody AuthorizationCodeDTO codeDTO) throws Exception {
-        AccessTokenDTO accessTokenDTO = userService.AppleGetAccessToken(codeDTO);
-        String accessToken = accessTokenDTO.getAccess_token();
-        String idToken = accessTokenDTO.getId_token();
-        SuccessHandlerDTO result = userService.getAppleUserInfo(accessToken, idToken);
+        AppleTokenDTO appleTokenDTO = userService.AppleGetAccessToken(codeDTO);
+        String accessToken = appleTokenDTO.getAccess_token();
+        String idToken = appleTokenDTO.getId_token();
+        String refreshToken = appleTokenDTO.getRefresh_token();
+        SuccessHandlerDTO result = userService.getAppleUserInfo(accessToken, idToken, refreshToken);
 
         response.setHeader("Authorization", result.getAccessToken());
         response.setHeader("RefreshToken", result.getRefreshToken());
@@ -49,9 +48,9 @@ public class LoginController {
     }
 
     @DeleteMapping("/revoke")
-    public ResponseEntity<?> RevokeUser(HttpServletRequest request, @RequestBody String accessToken) {
+    public ResponseEntity<?> RevokeUser(HttpServletRequest request) {
         String token = request.getHeader("Authorization");
-        userService.revoke(token, accessToken);
+        userService.revoke(token);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

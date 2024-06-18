@@ -22,22 +22,25 @@ public class UserEntity {
     private String identifier;
     private String name;
     private String email;
+    private String refresh_token;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="room_id")
     private RoomEntity room;
 
     @Builder
-    public UserEntity(String identifier, String name, String email, RoomEntity room) {
+    public UserEntity(String identifier, String name, String email, String refresh_token, RoomEntity room) {
         this.identifier = identifier;
         this.name = name;
         this.email = email;
         this.room = room;
+        this.refresh_token = refresh_token;
     }
 
-    public void update(String newName, String newEmail) {
+    public void update(String newName, String newEmail, String refresh_token) {
         this.name = newName;
         this.email = newEmail;
+        this.refresh_token = refresh_token;
     }
 
     public void updateRoom(RoomEntity newRoom) {

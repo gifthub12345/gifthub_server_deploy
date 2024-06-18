@@ -159,24 +159,45 @@ public class ImageService {
     }
 
 
+
+
+//    public List<ImageS3GetDTO> getImagesFromS3(Long room_id, Long category_id) {
+//        List<ImageEntity> byRoomIdAndCategoryId = imageRepository.findByRoomIdAndCategoryId(room_id, category_id);
+//        if(byRoomIdAndCategoryId != null ){
+//            List<ImageEntity> sortedImage = byRoomIdAndCategoryId.stream()
+//                    .sorted(Comparator.comparing(ImageEntity::getExpire))
+//                    .collect(Collectors.toList());
+//            List<ImageS3GetDTO> allImagesFromS3 = getAllImagesFromS3(sortedImage);
+//            return allImagesFromS3;
+//
+//        }
+//        return null;
+//    }
     public List<ImageS3GetDTO> getImagesFromS3(Long room_id, Long category_id) {
         List<ImageEntity> byRoomIdAndCategoryId = imageRepository.findByRoomIdAndCategoryId(room_id, category_id);
-        if(byRoomIdAndCategoryId != null ){
-            List<ImageEntity> sortedImage = byRoomIdAndCategoryId.stream()
+        if (byRoomIdAndCategoryId != null) {
+            return byRoomIdAndCategoryId.parallelStream()
                     .sorted(Comparator.comparing(ImageEntity::getExpire))
+                    .map(this::convertToDto)
                     .collect(Collectors.toList());
-            List<ImageS3GetDTO> allImagesFromS3 = getAllImagesFromS3(sortedImage);
-            return allImagesFromS3;
-
         }
-        return null;
+        return Collections.emptyList();
+    }
+
+    private ImageS3GetDTO convertToDto(ImageEntity imageEntity) {
+        return ImageS3GetDTO.builder()
+                .id(imageEntity.getId())
+                .url(imageEntity.getUrl())
+                .build();
     }
 
 
     public List<ImageS3GetDTO> getAllImagesFromS3(List<ImageEntity> s3List) {
         List<ImageS3GetDTO> imageS3GetDTOList = new ArrayList<>();
         for(ImageEntity imageEntity: s3List){
-            ImageS3GetDTO imageS3GetDTO = ImageS3GetDTO.builder().url(imageEntity.getUrl()).build();
+            ImageS3GetDTO imageS3GetDTO = ImageS3GetDTO.builder()
+                    .id(imageEntity.getId())
+                    .url(imageEntity.getUrl()).build();
             imageS3GetDTOList.add(imageS3GetDTO);
         }
         return imageS3GetDTOList;

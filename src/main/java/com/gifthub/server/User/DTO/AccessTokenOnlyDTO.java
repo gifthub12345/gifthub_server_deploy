@@ -4,5 +4,6 @@ import lombok.Data;
 
 @Data
 public class AccessTokenOnlyDTO {
-    private String token;
+    private String accessToken;
+    private String idToken;
 }

@@ -85,8 +85,8 @@ public class OAuth2Service extends DefaultOAuth2UserService {
             userRepository.save(newUser);
         }
         else {
-            existUser.update(authAttributes.getName(), authAttributes.getEmail());
-            userRepository.save(existUser);
+//            existUser.update(authAttributes.getName(), authAttributes.getEmail());
+//            userRepository.save(existUser);
         }
 
         UserOAuthDTO userOAuthDTO = UserOAuthDTO.builder()

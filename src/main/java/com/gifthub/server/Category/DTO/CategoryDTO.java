@@ -9,9 +9,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CategoryDTO {
     private String title;
-
+    private String roomTitle;
     @Builder
-    public CategoryDTO(String title) {
+    public CategoryDTO(String title, String roomTitle) {
+        this.roomTitle = roomTitle;
         this.title = title;
     }
 }
